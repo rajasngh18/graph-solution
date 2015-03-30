@@ -1,0 +1,157 @@
+# graph-solution
+#appendix -c
+#q-3
+import numpy as np
+import matplotlib.pyplot as plt
+
+class PolynomialSolver:
+    def line_create(self,a,b,c):
+        ##r = lambda: random.randint(0,255)
+        ##colr='#%02X%02X%02X' % (r(),r(),r())
+        b=float(b)
+        a=float(a)
+        c=float(c)
+        if b!=0:
+            t=np.arange(-5,15,0.1)
+            y=lambda t:(c-a*t)/b
+            plt.plot(t,y(t),color="black")
+        else:
+            y=np.arange(-20,60,0.1)
+            t=[(c/a)]*(y.size)
+            plt.plot(t,y,color="black")
+    def Func(self,n,L,val):                                                 ## method for finding value of polynomial function at x i.e. f(x)
+        p=0.0
+        for i in range(n+1):
+            p+=L[i]*(val**(n-i))
+        return p
+    def Fder(self,n,L,val):
+        p=0.0
+        for i in range(1,n+1):
+            p+=i*L[i]*(val**(i-1))                      
+        return p
+    def solve(self,n,L,method):
+       
+        if(method=="bisection"):                                         ## for bisection method 
+            print("Enter lower bound  in which root lies")
+            l=float(input())
+            print("Enter upper bound in which root lies")
+            u=float(input())
+            print("Enter maximum number of itertions")
+            it=float(input())
+            
+            s="("+str(l)+","+str(0)+")"
+            plt.annotate(s,xy=(l,-2),xytext=(l,-2))                     ## for displaying (x,y)
+            s="("+str(u)+","+str(0)+")"
+            plt.annotate(s,xy=(u,-2),xytext=(u,-2)) 
+            
+            plt.plot(l,self.Func(n,L,l),'ro')
+            plt.plot(u,self.Func(n,L,u),'ro')
+            if(self.Func(n,L,l)>0):
+                y=np.arange(0,self.Func(n,L,l),0.001)
+            else:
+                y=np.arange(self.Func(n,L,l),0,0.001)
+            plt.plot([l]*y.size,y,'r')
+            if(self.Func(n,L,u)>0):
+               y=np.arange(0,self.Func(n,L,u),0.001)
+            else:
+                y=np.arange(self.Func(n,L,u),0,0.001)
+            plt.plot([u]*y.size,y,'r')
+            
+            while((abs(self.Func(n,L,l))>0.000001 or abs(self.Func(n,L,u))>0.000001)and it>0):
+                m=(l+u)/2
+                if(self.Func(n,L,m)>0): 
+                    y=np.arange(0,self.Func(n,L,m),0.001)
+                else:
+                    y=np.arange(self.Func(n,L,m),0,0.001)
+                plt.plot([m]*y.size,y,'r')
+                plt.plot(m,self.Func(n,L,m),'ro')
+                
+                if(self.Func(n,L,l)*self.Func(n,L,m)<0):
+                    u=m
+                else:
+                    l=m
+                ##print (l,u,self.Func(n,L,l),self.Func(n,L,u))
+                it-=1
+##            plt.show()
+            if l<u:
+                return l
+            else:
+                return u
+        if(method=="secant"):                                   ## for secant method
+            print("Enter lower bound in which root lies")
+            l=float(input())
+            print("Enter upper bound in which root lies")
+            u=float(input())
+            print("Enter maximum number of itertions")
+            it=float(input())
+            
+            while(abs(self.Func(n,L,l))>0.00001 and it>0):
+                f1=self.Func(n,L,l)
+                f2=self.Func(n,L,u)
+                l,u=u,u-(((u-l)*f2)/(f2-f1))
+                ##print (l,u,f1,f2)
+                it-=1
+                
+               
+                
+            return(l)
+        if(method=="secantRF"):                                 ## for secantRF method
+            print("Enter lower bound in which root lies")
+            l=float(input())
+            print("Enter upper bound in which root lies")
+            u=float(input())
+            m=l
+            print("Enter maximum number of itertions")
+            it=float(input())
+            
+        
+            while(abs(self.Func(n,L,m))>0.000001 and it>0):
+                f1=self.Func(n,L,l)
+                f2=self.Func(n,L,u)
+                m=u-(((u-l)*f2)/(f2-f1))
+                fm=self.Func(n,L,m)
+              
+                if(f1*fm<0):
+                    u=m
+                else:
+                    l=m
+                ##print (m)
+                it-=1
+
+            return(l)
+        if(method=="newtonraphson"):                            ## for newtonraphson method
+            print("Enter lower bound in which root lies")
+            l=float(input())
+            print("Enter maximum number of itertions")
+            it=float(input())
+            
+            
+            
+            while(abs(self.Func(n,L,l))>0.000001 and it>0):
+                l=l-self.Func(n,L,l)/self.Fder(n,L,l)
+               
+
+            return(l)
+        else:
+            return NULL
+
+
+
+
+ps=PolynomialSolver()   
+
+x = np.linspace(-5,15,1000)
+ps.line_create(1,0,0)
+ps.line_create(0,1,0)
+plt.plot(x,ps.Func(2,[1.0,-6.0,5.0],x), color='b')
+solution=ps.solve(2,[1.0,-6.0,5.0],"bisection")
+plt.xlim(-5,15)
+plt.ylim(-20,60)
+plt.annotate("$x-axis$",xy=(12,-2),xytext=(12,-2))
+plt.annotate("$y-axis$",xy=(-2,55),xytext=(-2,55))
+plt.annotate("$o$",xy=(-0.5,-2),xytext=(-0.5,-2))
+
+s="$root:$"+"("+str(solution)+","+str(0)+")"
+plt.annotate(s,xy=(solution,+2),xytext=(solution,-4)) 
+print(solution)
+plt.show()
